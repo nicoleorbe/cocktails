@@ -34,46 +34,91 @@
     <!-- Replace with the URL to an image representing the cocktail -->
     <meta name="twitter:card" content="summary_large_image" />
     <title>Cocktail Recipe</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Cocktail Recipe: <span id="cocktail-name"></span></h1>
+    <!-- Add a search input field and button -->
+    <div>
+      <label for="search-input">Search for a Cocktail:</label>
+      <input type="text" id="search-input" placeholder="Enter cocktail name" />
+      <button type="button" onclick="searchCocktail()">Search</button>
+    </div>
+
+    <h1><span id="cocktail-name"></span></h1>
+    <div id="cocktail-image"></div>
     <div id="ingredients"></div>
     <p id="instructions"></p>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-      // Your API call with the provided data
-      var name = "bloody mary";
-      $.ajax({
-        method: "GET",
-        url: "https://api.api-ninjas.com/v1/cocktail?name=" + name,
-        headers: { "X-Api-Key": "YOUR_API_KEY" }, // Replace YOUR_API_KEY with your actual API key
-        contentType: "application/json",
-        success: function (result) {
-          // Extract data from the API response
-          var cocktail = result[0];
-          var cocktailName = cocktail.name;
-          var ingredients = cocktail.ingredients;
-          var instructions = cocktail.instructions;
+      function searchCocktail() {
+        // Retrieve the user's search query
+        var name = document.getElementById("search-input").value;
 
-          // Display the data on the page
-          document.getElementById("cocktail-name").innerText = cocktailName;
+        // Perform the cocktail API call
+        var cocktailURL = "https://api.api-ninjas.com/v1/cocktail?name=" + name;
+        $.ajax({
+          method: "GET",
+          url: cocktailURL,
+          headers: { "X-Api-Key": "7v1cC1Ow5uNWHmhD0jv85Q==uboIKGzJ7OG2Lnpf" }, // Replace YOUR_API_KEY with your actual API key
+          contentType: "application/json",
+          success: function (cocktailResult) {
+            if (cocktailResult.length > 0) {
+              // Extract data from the cocktail API response
+              var cocktail = cocktailResult[0];
+              var cocktailName = cocktail.name;
+              var ingredients = cocktail.ingredients;
+              var instructions = cocktail.instructions;
 
-          var ingredientsList = "<ul>";
-          ingredients.forEach(function (ingredient) {
-            ingredientsList += "<li>" + ingredient + "</li>";
-          });
-          ingredientsList += "</ul>";
-          document.getElementById("ingredients").innerHTML =
-            "<h2>Ingredients:</h2>" + ingredientsList;
+              // Display the cocktail data on the page
+              document.getElementById("cocktail-name").innerText = cocktailName;
 
-          document.getElementById("instructions").innerText =
-            "Instructions: " + instructions;
-        },
-        error: function ajaxError(jqXHR) {
-          console.error("Error: ", jqXHR.responseText);
-        },
-      });
+              var ingredientsList = "<ul>";
+              ingredients.forEach(function (ingredient) {
+                ingredientsList += "<li>" + ingredient + "</li>";
+              });
+              ingredientsList += "</ul>";
+              document.getElementById("ingredients").innerHTML =
+                "<h2>Ingredients:</h2>" + ingredientsList;
+
+              document.getElementById("instructions").innerText =
+                "Instructions: " + instructions;
+
+              // Perform the Pixabay API call to get an image for the cocktail
+              var API_KEY = "36029855-4c738434be11b19682cb333f0";
+              var pixabayURL =
+                "https://pixabay.com/api/?key=" +
+                API_KEY +
+                "&q=" +
+                encodeURIComponent(name) +
+                "&image_type=photo";
+              $.getJSON(pixabayURL, function (data) {
+                if (parseInt(data.totalHits) > 0) {
+                  // Display the cocktail image on the page
+                  var imageUrl = data.hits[0].webformatURL;
+                  var cocktailImageElement = document.createElement("img");
+                  cocktailImageElement.src = imageUrl;
+                  cocktailImageElement.alt = cocktailName;
+                  document.getElementById("cocktail-image").innerHTML = "";
+                  document
+                    .getElementById("cocktail-image")
+                    .appendChild(cocktailImageElement);
+                }
+              });
+            } else {
+              // Handle the case where the cocktail name was not found
+              document.getElementById("cocktail-name").innerText =
+                "Cocktail not found";
+              document.getElementById("ingredients").innerHTML = "";
+              document.getElementById("instructions").innerText = "";
+              document.getElementById("cocktail-image").innerHTML = "";
+            }
+          },
+          error: function ajaxError(jqXHR) {
+            console.error("Error fetching cocktail: ", jqXHR.responseText);
+          },
+        });
+      }
     </script>
   </body>
 </html>

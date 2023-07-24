@@ -1,0 +1,22 @@
+:root {
+  --blue: #323952;
+  --red: #f8425b;
+  --yellow: #f8d438;
+  --green: #54beb3;
+  --light: #e0eaef;
+  --main-font-color: #222;
+  --sec-font-color: #444;
+  --main-font: "Trebuchet MS", sans-serif;
+}
+
+body,
+* {
+  box-sizing: border-box;
+  font-family: var(--main-font);
+  color: var(--main-font-color);
+  font-size: 16px;
+}
+
+body {
+  margin: 0px;
+}
